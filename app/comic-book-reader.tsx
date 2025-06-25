@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react"
 import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import Link from "next/link"
+import { Navigation } from "./newnavbar"
 
 export default function ComicBookReader() {
   const [isOpen, setIsOpen] = useState(false)
@@ -16,6 +18,8 @@ export default function ComicBookReader() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [isHovered, setIsHovered] = useState(false)
   const [hoveredPhoto, setHoveredPhoto] = useState<string | null>(null)
+  const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
 
   const pages = [
     {
@@ -71,14 +75,12 @@ export default function ComicBookReader() {
     },
   ]
 
-  const handleScroll = (e: WheelEvent) => {
-    e.preventDefault()
-
+  const handlePageNavigation = (direction: "next" | "prev") => {
     const now = Date.now()
     if (now - lastScrollTime.current < 500 || isFlipping || isOpening) return
     lastScrollTime.current = now
 
-    if (e.deltaY > 0) {
+    if (direction === "next") {
       if (currentPage < pages.length - 1) {
         setFlipDirection("next")
         setIsFlipping(true)
@@ -106,12 +108,54 @@ export default function ComicBookReader() {
     }
   }
 
+  const handleTouchStart = (e: TouchEvent) => {
+    const touch = e.touches[0]
+    touchStartX.current = touch.clientX
+    touchStartY.current = touch.clientY
+  }
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    if (!touchStartX.current || !touchStartY.current) return
+
+    const touch = e.changedTouches[0]
+    const deltaX = touch.clientX - touchStartX.current
+    const deltaY = touch.clientY - touchStartY.current
+
+    // Only handle horizontal swipes that are more significant than vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+      if (deltaX > 0 && currentPage > 0) {
+        // Swipe right - previous page
+        setFlipDirection("prev")
+        setIsFlipping(true)
+        setTimeout(() => {
+          setCurrentPage((prev) => prev - 1)
+          setTimeout(() => setIsFlipping(false), 300)
+        }, 300)
+      } else if (deltaX < 0 && currentPage < pages.length - 1) {
+        // Swipe left - next page
+        setFlipDirection("next")
+        setIsFlipping(true)
+        setTimeout(() => {
+          setCurrentPage((prev) => prev + 1)
+          setTimeout(() => setIsFlipping(false), 300)
+        }, 300)
+      }
+    }
+
+    touchStartX.current = null
+    touchStartY.current = null
+  }
+
   useEffect(() => {
     if (isOpen) {
       const bookElement = document.getElementById("book-container")
       if (bookElement) {
-        bookElement.addEventListener("wheel", handleScroll, { passive: false })
-        return () => bookElement.removeEventListener("wheel", handleScroll)
+        bookElement.addEventListener("touchstart", handleTouchStart, { passive: true })
+        bookElement.addEventListener("touchend", handleTouchEnd, { passive: true })
+        return () => {
+          bookElement.removeEventListener("touchstart", handleTouchStart)
+          bookElement.removeEventListener("touchend", handleTouchEnd)
+        }
       }
     }
   }, [isOpen, currentPage, isFlipping, isOpening])
@@ -141,7 +185,10 @@ export default function ComicBookReader() {
     if (!pageData) return null
 
     return (
-      <div className="w-full h-full relative overflow-hidden">
+      <div
+        className="w-
+      full h-full relative overflow-hidden"
+      >
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
@@ -150,7 +197,7 @@ export default function ComicBookReader() {
         />
         <div className="absolute inset-0 bg-orange-50/10" />
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-4 sm:gap-6 sm:p-8">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-2 sm:gap-4 sm:p-4 md:gap-6 md:p-8">
           {pageData.photos.map((photo: any, index: number) => {
             const photoKey = `${currentPage}-${isLeft ? "left" : "right"}-${index}`
             const isHovered = hoveredPhoto === photoKey
@@ -161,16 +208,19 @@ export default function ComicBookReader() {
                 className="relative rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:brightness-110 border-4 border-white/90 animate-fade-in-up"
                 style={{
                   animationDelay: `${index * 0.2}s`,
-                  maxWidth: "100%",
-                  maxHeight: "70%",
-                  minHeight: "250px",
+                  maxWidth: "90%",
+                  maxHeight: window.innerWidth < 640 ? "45%" : "70%",
+                  minHeight: "120px",
+                  sm: { minHeight: "150px" },
+                  md: { minHeight: "200px" },
+                  lg: { minHeight: "250px" },
                   transform: `rotate(${index % 2 === 0 ? 3 : -3}deg)`,
                 }}
                 onMouseEnter={() => setHoveredPhoto(photoKey)}
                 onMouseLeave={() => setHoveredPhoto(null)}
               >
                 <img
-                  src={photo.default || photo || "/placeholder.png"}
+                  src={photo.default || photo || "/placeholder.svg?height=200&width=300"}
                   alt="Comic Photo"
                   className="w-full h-full object-contain transition-all duration-300"
                 />
@@ -183,21 +233,38 @@ export default function ComicBookReader() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-yellow-100 p-4 sm:p-8 md:p-20 pt-16 sm:pt-24 md:pt-32">
+    <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-yellow-100 p-2 sm:p-4 md:p-8 lg:p-20 pt-12 sm:pt-16 md:pt-24 lg:pt-32">
+      <Navigation />
+
+      {/* Back to Home Button */}
+      <div className="fixed top-4 left-4 z-50">
+        <Link href="/">
+          <Button variant="outline" className="bg-white/90 backdrop-blur-sm">
+            ← Back to Home
+          </Button>
+        </Link>
+      </div>
+
       {/* Animated Heading */}
-      <div className="mb-8 text-center">
+      <div className="mb-10 text-center">
         <h1
-          className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500 text-7xl lg:text-7xl font-INTER BOLD text-gray-900 mb-20 leading-tight max-w-7xl mx-auto"
+          className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-2 leading-tight max-w-xs sm:max-w-sm md:max-w-4xl lg:max-w-7xl mx-auto"
           style={{
             backgroundImage: `linear-gradient(to right, #FF8C00, #FF6B35, #FF8C00)`,
           }}
         >
-                          <span className="text-gray-900">A DAY IN A </span>
-
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">
-                  CAR DEALERSHIP
-                </span>
+          <span className="text-gray-900">Is This </span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">You?</span>
         </h1>
+        <p>
+          <span className="text-gray-900 text-xs sm:text-sm font-inter">
+            (get to know in{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500 font-bold">
+              28 seconds
+            </span>{" "}
+            )
+          </span>
+        </p>
         <div className="mt-4 flex justify-center space-x-2">
           <div className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: "#FF8C00" }}></div>
           <div className="w-3 h-3 bg-orange-300 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
@@ -208,7 +275,7 @@ export default function ComicBookReader() {
         </div>
       </div>
 
-      <div className="relative">
+      <div id="interactive" className="relative">
         {!isOpen ? (
           // Closed Book with Photo Cover
           <div
@@ -222,14 +289,14 @@ export default function ComicBookReader() {
               perspective: "1000px",
             }}
           >
-            <Card className="w-full sm:w-[400px] md:w-[500px] h-[500px] sm:h-[550px] md:h-[600px] shadow-2xl relative overflow-hidden border-4 border-orange-400 bg-white">
+            <Card className="w-[280px] sm:w-[350px] md:w-[450px] lg:w-[500px] h-[400px] sm:h-[500px] md:h-[620px] lg:h-[720px] shadow-2xl relative overflow-hidden border-4 border-orange-400 bg-white">
               <div className="absolute inset-0">
-                <img src="COVER.jpg" alt="Comic Book Cover" className="w-full h-full object-cover" />
+                <img src="/Title.png" alt="Comic Book Cover" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-orange-900/70 via-transparent to-yellow-900/30"></div>
               </div>
               <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-white">
                 <div className="text-yellow-200 text-xs sm:text-sm bg-gray-800/70 px-4 py-1 rounded-full backdrop-blur-sm border border-orange-300/30">
-                  Click to explore • Scroll to turn pages
+                  Click to Open • Tap to turn pages
                 </div>
               </div>
               <div className="absolute right-0 top-0 w-3 h-full bg-gradient-to-l from-orange-600 to-orange-400 shadow-inner"></div>
@@ -238,16 +305,29 @@ export default function ComicBookReader() {
           </div>
         ) : (
           // Open Book with Page Turning Animation
-          <div id="book-container" className="relative cursor-grab active:cursor-grabbing">
+          <div id="book-container" className="relative">
             <Card
-              className={`w-full sm:w-[800px] md:w-[900px] h-[500px] sm:h-[550px] md:h-[600px] bg-white shadow-2xl relative overflow-hidden border border-orange-200 transition-all duration-1000 ${isOpening ? "animate-book-open" : ""}`}
+              className={`w-[320px] sm:w-[600px] md:w-[800px] lg:w-[900px] h-[240px] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-white shadow-2xl relative overflow-hidden border border-orange-200 transition-all duration-1000 ${isOpening ? "animate-book-open" : ""}`}
             >
+              {/* Invisible tap areas for navigation */}
+              <div
+                className="absolute left-0 top-0 w-1/2 h-full z-30 cursor-pointer"
+                onClick={() => handlePageNavigation("prev")}
+                title="Previous page"
+              />
+              <div
+                className="absolute right-0 top-0 w-1/2 h-full z-30 cursor-pointer"
+                onClick={() => handlePageNavigation("next")}
+                title="Next page"
+              />
+
               {/* Book Binding */}
               <div className="absolute left-1/2 top-0 w-2 h-full bg-orange-600 transform -translate-x-1/2 z-20 shadow-lg"></div>
 
+              {/* Rest of the existing book content remains the same */}
               {/* Opening Animation Cover */}
               {isOpening && (
-                <div className="absolute inset-0 z-30">
+                <div className="absolute inset-0 z-25">
                   <div className="absolute left-0 top-0 w-1/2 h-full bg-white origin-right animate-page-turn-left shadow-2xl">
                     <div className="w-full h-full bg-gradient-to-r from-orange-100 to-orange-50 flex items-center justify-center">
                       <div className="text-gray-600 text-lg font-serif">Opening...</div>
@@ -299,9 +379,9 @@ export default function ComicBookReader() {
             </Card>
 
             {/* Instructions */}
-            <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center">
-              <p className="text-gray-700 text-xs sm:text-sm font-medium">
-                Scroll down for next page • Scroll up for previous page • Hover over photos for effects
+            <div className="absolute -bottom-12 sm:-bottom-16 left-1/2 transform -translate-x-1/2 text-center">
+              <p className="text-gray-700 text-[10px] sm:text-xs md:text-sm font-medium">
+                Tap left side for previous • Tap right side for next
               </p>
               <p className="text-gray-600 text-xs mt-1">
                 Page {currentPage + 1} of {pages.length}
@@ -309,11 +389,18 @@ export default function ComicBookReader() {
             </div>
 
             {/* Close Button */}
-            
+            <Button
+              onClick={closeBook}
+              variant="outline"
+              size="sm"
+              className="absolute -top-12 right-0 bg-white text-gray-600 hover:bg-gray-50 z-40"
+            >
+              <X className="w-4 h-4 mr-1" />
+              Close
+            </Button>
           </div>
         )}
       </div>
-
       {/* Audio element for book opening sound */}
       <audio ref={audioRef} preload="auto">
         <source src="/book.mp4" type="audio/mp4" />
@@ -384,15 +471,6 @@ export default function ComicBookReader() {
           }
         }
         
-        @keyframes pulse-glow {
-          0%, 100% {
-            text-shadow: 0 0 20px rgba(255, 140, 0, 0.5), 0 0 40px rgba(255, 140, 0, 0.3), 0 0 60px rgba(255, 140, 0, 0.1);
-          }
-          50% {
-            text-shadow: 0 0 30px rgba(255, 140, 0, 0.8), 0 0 60px rgba(255, 140, 0, 0.5), 0 0 90px rgba(255, 140, 0, 0.3);
-          }
-        }
-        
         .animate-flip-next {
           animation: flip-next 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
@@ -412,10 +490,6 @@ export default function ComicBookReader() {
         .animate-fade-in-up {
           animation: fade-in-up 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
           opacity: 0;
-        }
-        
-        .animate-pulse-glow {
-          animation: pulse-glow 3s ease-in-out infinite;
         }
         
         #book-container {
