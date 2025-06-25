@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { X } from 'lucide-react'
+import { X, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
 import { Navigation } from "./newnavbar"
+import { ContactModal } from "./contact-modal"
 
 export default function ComicBookReader() {
   const [isOpen, setIsOpen] = useState(false)
@@ -13,7 +14,9 @@ export default function ComicBookReader() {
   const [isFlipping, setIsFlipping] = useState(false)
   const [isOpening, setIsOpening] = useState(false)
   const [flipDirection, setFlipDirection] = useState<"next" | "prev">("next")
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>()
+  const [showContactModal, setShowContactModal] = useState(false)
+  const [showBackCover, setShowBackCover] = useState(false)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastScrollTime = useRef(0)
   const audioRef = useRef<HTMLAudioElement>(null)
   const [isHovered, setIsHovered] = useState(false)
@@ -89,12 +92,10 @@ export default function ComicBookReader() {
           setTimeout(() => setIsFlipping(false), 300)
         }, 300)
       } else {
-        setIsFlipping(true)
-        setTimeout(() => {
-          setIsOpen(false)
-          setCurrentPage(0)
-          setIsFlipping(false)
-        }, 500)
+        // After last page, close the book and show back cover WITHOUT animation
+        setIsOpen(false)
+        setShowBackCover(true)
+        setCurrentPage(0)
       }
     } else {
       if (currentPage > 0) {
@@ -139,6 +140,11 @@ export default function ComicBookReader() {
           setCurrentPage((prev) => prev + 1)
           setTimeout(() => setIsFlipping(false), 300)
         }, 300)
+      } else if (deltaX < 0 && currentPage === pages.length - 1) {
+        // Swipe left on last page - close book WITHOUT animation
+        setIsOpen(false)
+        setShowBackCover(true)
+        setCurrentPage(0)
       }
     }
 
@@ -168,6 +174,7 @@ export default function ComicBookReader() {
 
     setIsOpening(true)
     setIsOpen(true)
+    setShowBackCover(false)
     setCurrentPage(0)
 
     setTimeout(() => {
@@ -177,6 +184,7 @@ export default function ComicBookReader() {
 
   const closeBook = () => {
     setIsOpen(false)
+    setShowBackCover(false)
     setCurrentPage(0)
     setIsOpening(false)
   }
@@ -185,10 +193,7 @@ export default function ComicBookReader() {
     if (!pageData) return null
 
     return (
-      <div
-        className="w-
-      full h-full relative overflow-hidden"
-      >
+      <div className="w-full h-full relative overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
@@ -202,18 +207,49 @@ export default function ComicBookReader() {
             const photoKey = `${currentPage}-${isLeft ? "left" : "right"}-${index}`
             const isHovered = hoveredPhoto === photoKey
 
-            return (
-              <div
-                key={index}
-                className="relative rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:brightness-110 border-4 border-white/90 animate-fade-in-up"
-                style={{
-                  animationDelay: `${index * 0.2}s`,
+            // Special sizing for specific images
+            const getImageStyles = () => {
+              const photoSrc = photo.default || photo
+
+              if (photoSrc === "12.png") {
+                return {
+                  maxWidth: "95%",
+                  maxHeight: window.innerWidth < 640 ? "55%" : window.innerWidth < 768 ? "80%" : "85%",
+                  minHeight: "200px",
+                  sm: { minHeight: "280px" },
+                  md: { minHeight: "380px" },
+                  lg: { minHeight: "450px" },
+                }
+              } else if (photoSrc === "13.png") {
+                return {
+                  maxWidth: "75%",
+                  maxHeight: window.innerWidth < 640 ? "35%" : window.innerWidth < 768 ? "55%" : "65%",
+                  minHeight: "120px",
+                  sm: { minHeight: "160px" },
+                  md: { minHeight: "220px" },
+                  lg: { minHeight: "280px" },
+                }
+              } else {
+                return {
                   maxWidth: "85%",
                   maxHeight: window.innerWidth < 640 ? "40%" : window.innerWidth < 768 ? "65%" : "75%",
                   minHeight: "150px",
                   sm: { minHeight: "200px" },
                   md: { minHeight: "280px" },
                   lg: { minHeight: "350px" },
+                }
+              }
+            }
+
+            const imageStyles = getImageStyles()
+
+            return (
+              <div
+                key={index}
+                className="relative rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:brightness-110 border-4 border-white/90 animate-fade-in-up"
+                style={{
+                  animationDelay: `${index * 0.2}s`,
+                  ...imageStyles,
                   transform: `rotate(${index % 2 === 0 ? 3 : -3}deg)`,
                 }}
                 onMouseEnter={() => setHoveredPhoto(photoKey)}
@@ -233,7 +269,7 @@ export default function ComicBookReader() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-yellow-100 p-2 sm:p-4 md:p-8 lg:p-20 pt-12 sm:pt-16 md:pt-24 lg:pt-32">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-yellow-100 p-2 sm:p-4 md:p-8 lg:p-20">
       <Navigation />
 
       {/* Back to Home Button */}
@@ -253,7 +289,7 @@ export default function ComicBookReader() {
             backgroundImage: `linear-gradient(to right, #FF8C00, #FF6B35, #FF8C00)`,
           }}
         >
-          <span className="text-gray-900">Is This </span> 
+          <span className="text-gray-900">Is This </span>
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">You?</span>
         </h1>
         <p>
@@ -275,9 +311,9 @@ export default function ComicBookReader() {
         </div>
       </div>
 
-      <div id="interactive" className="relative">
-        {!isOpen ? (
-          // Closed Book with Photo Cover
+      <div id="interactive" className="relative flex items-center justify-center">
+        {!isOpen && !showBackCover ? (
+          // Front Cover - Closed Book
           <div
             className="cursor-pointer transform perspective-1000 transition-all duration-500"
             onClick={openBook}
@@ -303,8 +339,58 @@ export default function ComicBookReader() {
               <div className="absolute right-3 top-0 w-1 h-full bg-orange-500"></div>
             </Card>
           </div>
+        ) : showBackCover ? (
+          // Back Cover - Closed Book with Contact Us
+          <div className="transform perspective-1000">
+            <Card className="w-[280px] sm:w-[350px] md:w-[450px] lg:w-[500px] h-[400px] sm:h-[500px] md:h-[620px] lg:h-[720px] shadow-2xl relative overflow-hidden border-4 border-orange-400 bg-white">
+              <div className="absolute inset-0">
+                <img src="/Black.jpg" alt="Comic Book Back Cover" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-orange-900/80 via-transparent to-yellow-900/40"></div>
+              </div>
+
+              {/* Contact Us Section */}
+              <div className="absolute inset-0 p-8 flex flex-col items-center justify-center text-white z-10">
+                <div className="text-center mb-8">
+                  <h2 className="text-white text-2xl sm:text-3xl md:text-4xl font-bold mb-4 drop-shadow-lg">
+                    Ready to Get Started?
+                  </h2>
+                  <p className="text-yellow-200 text-sm sm:text-lg mb-8 drop-shadow-md">
+                    Let's discuss how we can help your business grow
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setShowContactModal(true)}
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 group transform hover:scale-105 z-50 mb-4 cursor-pointer"
+                  style={{
+                    boxShadow: "0 15px 35px rgba(245, 158, 11, 0.5)",
+                  }}
+                >
+                  Contact Us
+                  <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowBackCover(false)
+                    setIsOpen(false)
+                    setCurrentPage(0)
+                    setIsFlipping(false)
+                    setIsOpening(false)
+                    setHoveredPhoto(null)
+                  }}
+                  className="text-yellow-200 text-sm underline hover:text-white transition-colors duration-300 cursor-pointer z-50"
+                >
+                  ← Read Again
+                </button>
+              </div>
+
+              <div className="absolute left-0 top-0 w-3 h-full bg-gradient-to-r from-orange-600 to-orange-400 shadow-inner"></div>
+              <div className="absolute left-3 top-0 w-1 h-full bg-orange-500"></div>
+            </Card>
+          </div>
         ) : (
-          // Open Book with Page Turning Animation
+          // Open Book
           <div id="book-container" className="relative">
             <Card
               className={`w-[400px] sm:w-[700px] md:w-[1000px] lg:w-[1200px] h-[300px] sm:h-[500px] md:h-[650px] lg:h-[800px] bg-white shadow-2xl relative overflow-hidden border border-orange-200 transition-all duration-1000 ${isOpening ? "animate-book-open" : ""}`}
@@ -324,7 +410,6 @@ export default function ComicBookReader() {
               {/* Book Binding */}
               <div className="absolute left-1/2 top-0 w-2 h-full bg-orange-600 transform -translate-x-1/2 z-20 shadow-lg"></div>
 
-              {/* Rest of the existing book content remains the same */}
               {/* Opening Animation Cover */}
               {isOpening && (
                 <div className="absolute inset-0 z-25">
@@ -401,6 +486,10 @@ export default function ComicBookReader() {
           </div>
         )}
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal isOpen={showContactModal} onClose={() => setShowContactModal(false)} />
+
       {/* Audio element for book opening sound */}
       <audio ref={audioRef} preload="auto">
         <source src="/book.mp4" type="audio/mp4" />
@@ -494,6 +583,15 @@ export default function ComicBookReader() {
         
         #book-container {
           perspective: 1200px;
+        }
+
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>
