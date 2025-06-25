@@ -10,6 +10,8 @@ import { Poppins, Inter } from "next/font/google"
 import { Brain, Users, TrendingUp, Shield, Clock, FileText, BarChart3 } from "lucide-react"
 import { Navigation } from "./Navbar"
 import ExpandableFeatures from "./expandable-features"
+import { ContactModal } from "./contact-modal"
+
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -230,6 +232,8 @@ export default function RevenueGearLanding() {
   const { scrollYProgress } = useScroll()
   const [scrollDirection, setScrollDirection] = useState("up")
   const [lastScrollY, setLastScrollY] = useState(0)
+  const [contactModalOpen, setContactModalOpen] = useState(false)
+
 
   // Model opacity and scale - keep fixed size and position
   const modelOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.3])
@@ -422,27 +426,44 @@ export default function RevenueGearLanding() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="text-13px text-black-600 leading-relaxed"
+                className="text-4xl lg:text-xl font text-gray-900 mb-10 leading-tight max-w-5xl mx-auto"
                 >
-                  <span className="text-orange-500 font-bold">RevenueGear's</span> AI agent analyzes{" "}
-                  <span className="text-orange-500 font-bold">100%</span> of your customer calls.{" "}{" "} 
-                  <br></br>
-                  Flag customer churn
-                  risks, repeat issues, poor service quality gaps etc. instantly.
-                  <br />
-                  Unlock sales signals like budget, competitor brands analysis, test drive feedback, and buying intent.
+                  <span className="text-orange-500 font-bold">RevenueGear's</span> <span                 className="text-xl lg:text-xl font-bold text-gray-900 mb-10 leading-tight max-w-5xl mx-auto"
+>AI Agent reviews{" "}</span> 
+                  <span className="text-orange-500 font-bold">100%</span> of your calls to extract insights of customers with churn risks, poor service feedback, repeat issues, and sales & buying signals—across Indian & global languages.
                 </motion.p>
 
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="text-13px text-darkgray-600 leading-relaxed"
+                className="text-4xl lg:text-xl font text-gray-900 mb-10 leading-tight max-w-5xl mx-auto"
                 >
-                  Get a <span className="text-orange-500 font-bold">hotlist</span> of at-risk customers to retain and
-                  sales inquiries that could convert — with 360 voice analytics and agent performance – across Indian
-                  and global languages.
+                  Get a <span className="text-orange-500 font-bold">HOTLIST</span> of customers to save and leads to convert.
                 </motion.p>
+<div className="flex justify-center items-center w-full mt-4">
+  <motion.button
+    onClick={() =>
+      window.open(
+        "https://calendly.com/anand-clickto/get-your-at-risk-customers-list?month=2025-06",
+        "_blank"
+      )
+    }
+    className="text-white px-6 py-4 md:px-6 md:py-3 rounded-full font-medium tracking-wide shadow-md text-xs md:text-sm transition-all"
+    style={{
+      background: `linear-gradient(to right, #F9A01B, #F97316)`,
+    }}
+    whileHover={{
+      scale: 1.05,
+      boxShadow: "0 6px 12px rgba(249, 160, 27, 0.4)",
+    }}
+    whileTap={{ scale: 0.95 }}
+  >
+    <span className="flex flex-col items-center justify-center">
+      <span>Get Your HOTLIST</span>
+    </span>
+  </motion.button>
+</div>
 
                 {/* Stats */}
                 <motion.div
