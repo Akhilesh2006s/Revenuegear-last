@@ -190,7 +190,7 @@ export default function ContactForm() {
                   value={formData.phone}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300"
-                  placeholder="Enter your phone number (optional)"
+                  placeholder="Enter your phone number "
                 />
               </motion.div>
 
@@ -205,7 +205,7 @@ export default function ContactForm() {
                   value={formData.dealership}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300"
-                  placeholder="Enter your dealership name (optional)"
+                  placeholder="Enter your dealership name "
                 />
               </motion.div>
 
@@ -220,7 +220,7 @@ export default function ContactForm() {
                   onChange={handleInputChange}
                   rows={4}
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 resize-none"
-                  placeholder="Tell us about your specific needs or questions (optional)"
+                  placeholder="Tell us about your specific needs or questions "
                 />
               </motion.div>
 
@@ -266,7 +266,7 @@ export default function ContactForm() {
                 </div>
                 <div>
                   <div className="font-semibold">Email Us</div>
-                  <div className="text-gray-300">anand@clickto.tech</div>
+                  <div className="text-gray-300">anand@revlabs.tech</div>
                 </div>
               </motion.div>
             </div>
