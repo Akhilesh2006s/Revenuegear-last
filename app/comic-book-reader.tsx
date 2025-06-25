@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { X } from "lucide-react"
+import { X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
@@ -197,7 +197,7 @@ export default function ComicBookReader() {
         />
         <div className="absolute inset-0 bg-orange-50/10" />
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-2 sm:gap-4 sm:p-4 md:gap-6 md:p-8">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-3 sm:gap-6 sm:p-6 md:gap-8 md:p-10">
           {pageData.photos.map((photo: any, index: number) => {
             const photoKey = `${currentPage}-${isLeft ? "left" : "right"}-${index}`
             const isHovered = hoveredPhoto === photoKey
@@ -208,12 +208,12 @@ export default function ComicBookReader() {
                 className="relative rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:brightness-110 border-4 border-white/90 animate-fade-in-up"
                 style={{
                   animationDelay: `${index * 0.2}s`,
-                  maxWidth: "90%",
-                  maxHeight: window.innerWidth < 640 ? "45%" : "70%",
-                  minHeight: "120px",
-                  sm: { minHeight: "150px" },
-                  md: { minHeight: "200px" },
-                  lg: { minHeight: "250px" },
+                  maxWidth: "85%",
+                  maxHeight: window.innerWidth < 640 ? "40%" : window.innerWidth < 768 ? "65%" : "75%",
+                  minHeight: "150px",
+                  sm: { minHeight: "200px" },
+                  md: { minHeight: "280px" },
+                  lg: { minHeight: "350px" },
                   transform: `rotate(${index % 2 === 0 ? 3 : -3}deg)`,
                 }}
                 onMouseEnter={() => setHoveredPhoto(photoKey)}
@@ -253,7 +253,7 @@ export default function ComicBookReader() {
             backgroundImage: `linear-gradient(to right, #FF8C00, #FF6B35, #FF8C00)`,
           }}
         >
-          <span className="text-gray-900">Is This </span>
+          <span className="text-gray-900">Is This </span> 
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">You?</span>
         </h1>
         <p>
@@ -307,7 +307,7 @@ export default function ComicBookReader() {
           // Open Book with Page Turning Animation
           <div id="book-container" className="relative">
             <Card
-              className={`w-[320px] sm:w-[600px] md:w-[800px] lg:w-[900px] h-[240px] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-white shadow-2xl relative overflow-hidden border border-orange-200 transition-all duration-1000 ${isOpening ? "animate-book-open" : ""}`}
+              className={`w-[400px] sm:w-[700px] md:w-[1000px] lg:w-[1200px] h-[300px] sm:h-[500px] md:h-[650px] lg:h-[800px] bg-white shadow-2xl relative overflow-hidden border border-orange-200 transition-all duration-1000 ${isOpening ? "animate-book-open" : ""}`}
             >
               {/* Invisible tap areas for navigation */}
               <div
@@ -379,7 +379,7 @@ export default function ComicBookReader() {
             </Card>
 
             {/* Instructions */}
-            <div className="absolute -bottom-12 sm:-bottom-16 left-1/2 transform -translate-x-1/2 text-center">
+            <div className="absolute -bottom-16 sm:-bottom-20 left-1/2 transform -translate-x-1/2 text-center">
               <p className="text-gray-700 text-[10px] sm:text-xs md:text-sm font-medium">
                 Tap left side for previous • Tap right side for next
               </p>
@@ -393,7 +393,7 @@ export default function ComicBookReader() {
               onClick={closeBook}
               variant="outline"
               size="sm"
-              className="absolute -top-12 right-0 bg-white text-gray-600 hover:bg-gray-50 z-40"
+              className="absolute -top-16 right-0 bg-white text-gray-600 hover:bg-gray-50 z-40"
             >
               <X className="w-4 h-4 mr-1" />
               Close
