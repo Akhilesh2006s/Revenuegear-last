@@ -19,8 +19,7 @@ export function Navigation() {
   return (
     <>
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 py-1 sm:py-2"
-        style={{ backgroundColor: "white" }}
+        className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 py-1 sm:py-2 bg-white"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeInOut" }}
@@ -84,10 +83,11 @@ export function Navigation() {
         </div>
 
         {/* Mobile Hamburger */}
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-gray-700 hover:text-amber-400"
+            className="text-gray-700 hover:text-amber-400 focus:outline-none"
+            aria-label="Toggle menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -98,7 +98,7 @@ export function Navigation() {
         {/* CTA Button */}
         <motion.button
           onClick={() => setContactModalOpen(true)}
-          className="text-white px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-full font-medium text-[10px] sm:text-xs md:text-sm tracking-wide shadow-md transition-all text-center"
+          className="hidden sm:block text-white px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-full font-medium text-[10px] sm:text-xs md:text-sm tracking-wide shadow-md transition-all text-center"
           style={{
             background: `linear-gradient(to right, #F9A01B, #F97316)`,
           }}
@@ -122,9 +122,9 @@ export function Navigation() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-100 md:hidden"
+            className="fixed top-16 left-0 right-0 bg-white shadow-lg border-t border-gray-100 md:hidden z-40"
           >
-            <div className="flex flex-col space-y-3 p-3">
+            <div className="flex flex-col space-y-4 p-4">
               {[
                 { href: "#hero", label: "Home" },
                 { href: "#brands", label: "Trusted By" },
@@ -132,9 +132,9 @@ export function Navigation() {
                 { href: "#capabilities", label: "Capabilities" },
               ].map((item) => (
                 <a
-                  key={item.label}
+                  key={`mobile-${item.label}`}
                   href={item.href}
-                  className="text-gray-700 hover:text-amber-600 font-medium transition duration-200"
+                  className="text-gray-700 hover:text-amber-600 font-medium transition duration-200 py-2"
                   onClick={(e) => {
                     e.preventDefault()
                     setMobileMenuOpen(false)
@@ -148,18 +148,35 @@ export function Navigation() {
                 href="https://revlabs.tech/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-700 hover:text-amber-600 font-medium"
+                className="text-gray-700 hover:text-amber-600 font-medium py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Our Company
               </a>
               <Link
                 href="/comic-book-reader"
-                className="text-gray-700 hover:text-amber-600 font-medium"
+                className="text-gray-700 hover:text-amber-600 font-medium py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Is It For Me?
               </Link>
+              <motion.button
+          onClick={() => setContactModalOpen(true)}
+          className="text-white px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-full font-medium text-[10px] sm:text-xs md:text-sm tracking-wide shadow-md transition-all text-center"
+          style={{
+            background: `linear-gradient(to right, #F9A01B, #F97316)`,
+          }}
+          whileHover={{
+            scale: 1.05,
+            boxShadow: "0 6px 12px rgba(249, 160, 27, 0.4)",
+          }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <span className="leading-tight">
+            <span>Hear Every Customer.</span>
+            <span>Fix What Matters. Now!</span>
+          </span>
+        </motion.button>
             </div>
           </motion.div>
         )}
