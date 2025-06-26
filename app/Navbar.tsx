@@ -19,17 +19,17 @@ export function Navigation() {
   return (
     <>
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 py-2"
+        className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 py-1 sm:py-2"
         style={{ backgroundColor: "white" }}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeInOut" }}
       >
-        {/* Logo on the left */}
+        {/* Logo */}
         <motion.img
           src="321.png"
           alt="Revenue Gear Logo"
-          className="w-[120px] h-auto object-contain"
+          className="w-[100px] sm:w-[120px] h-auto object-contain"
           initial={{ y: 0 }}
           animate={{ y: -2 }}
           whileHover={{
@@ -42,59 +42,39 @@ export function Navigation() {
           }}
         />
 
-        {/* Navigation Menu - centered */}
-        <div className="hidden md:flex items-center space-x-8">
-          <a
-            href="#hero"
-            className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200 cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault()
-              document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" })
-            }}
-          >
-            Home
-          </a>
-          <a
-            href="#brands"
-            className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200 cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault()
-              document.getElementById("brands")?.scrollIntoView({ behavior: "smooth" })
-            }}
-          >
-            Trusted By
-          </a>
-          <a
-            href="#contributions"
-            className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200 cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault()
-              document.getElementById("contributions")?.scrollIntoView({ behavior: "smooth" })
-            }}
-          >
-            Our Contributions
-          </a>
-          <a
-            href="#capabilities"
-            className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200 cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault()
-              document.getElementById("capabilities")?.scrollIntoView({ behavior: "smooth" })
-            }}
-          >
-            Capabilities
-          </a>
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center space-x-3">
+          {[
+            { href: "#hero", label: "Home" },
+            { href: "#brands", label: "Trusted By" },
+            { href: "#contributions", label: "Our Contributions" },
+            { href: "#capabilities", label: "Capabilities" },
+          ].map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className="text-gray-700 hover:text-amber-600 font-medium transition duration-200"
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById(item.href.slice(1))?.scrollIntoView({ behavior: "smooth" })
+              }}
+            >
+              {item.label}
+            </a>
+          ))}
+
           <a
             href="https://revlabs.tech/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200 cursor-pointer"
+            className="text-gray-700 hover:text-amber-600 font-medium transition duration-200"
           >
             Our Company
           </a>
+
           <Link
             href="/comic-book-reader"
-            className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200 relative group"
+            className="text-gray-700 hover:text-amber-600 font-medium relative group"
           >
             <span className="relative">
               Is It For Me?
@@ -103,11 +83,11 @@ export function Navigation() {
           </Link>
         </div>
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Hamburger */}
         <div className="md:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-gray-700 hover:text-amber-400 transition-colors"
+            className="text-gray-700 hover:text-amber-400"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -115,85 +95,10 @@ export function Navigation() {
           </button>
         </div>
 
-        {/* Mobile Menu Dropdown */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-100 md:hidden"
-            >
-              <div className="flex flex-col space-y-4 p-4">
-                <a
-                  href="#hero"
-                  className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setMobileMenuOpen(false)
-                    document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" })
-                  }}
-                >
-                  Home
-                </a>
-                <a
-                  href="#brands"
-                  className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setMobileMenuOpen(false)
-                    document.getElementById("brands")?.scrollIntoView({ behavior: "smooth" })
-                  }}
-                >
-                  Trusted By
-                </a>
-                <a
-                  href="#contributions"
-                  className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setMobileMenuOpen(false)
-                    document.getElementById("contributions")?.scrollIntoView({ behavior: "smooth" })
-                  }}
-                >
-                  Our Contributions
-                </a>
-                <a
-                  href="#capabilities"
-                  className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setMobileMenuOpen(false)
-                    document.getElementById("capabilities")?.scrollIntoView({ behavior: "smooth" })
-                  }}
-                >
-                  Capabilities
-                </a>
-                <a
-                  href="https://revlabs.tech/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Our Company
-                </a>
-                <Link
-                  href="/comic-book-reader"
-                  className="text-gray-700 hover:text-amber-600 font-medium transition-colors duration-200"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Is It For Me?
-                </Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Contact Us Button on the right */}
+        {/* CTA Button */}
         <motion.button
           onClick={() => setContactModalOpen(true)}
-          className="text-white px-4 py-2 md:px-6 md:py-3 rounded-full font-medium tracking-wide shadow-md text-xs md:text-sm transition-all text-center"
+          className="text-white px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-full font-medium text-[10px] sm:text-xs md:text-sm tracking-wide shadow-md transition-all text-center"
           style={{
             background: `linear-gradient(to right, #F9A01B, #F97316)`,
           }}
@@ -203,12 +108,62 @@ export function Navigation() {
           }}
           whileTap={{ scale: 0.95 }}
         >
-          <span className="flex flex-col items-center justify-center">
+          <span className="leading-tight">
             <span>Hear Every Customer.</span>
             <span>Fix What Matters. Now!</span>
           </span>
         </motion.button>
       </motion.nav>
+
+      {/* Mobile Dropdown */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-100 md:hidden"
+          >
+            <div className="flex flex-col space-y-3 p-3">
+              {[
+                { href: "#hero", label: "Home" },
+                { href: "#brands", label: "Trusted By" },
+                { href: "#contributions", label: "Our Contributions" },
+                { href: "#capabilities", label: "Capabilities" },
+              ].map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="text-gray-700 hover:text-amber-600 font-medium transition duration-200"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setMobileMenuOpen(false)
+                    document.getElementById(item.href.slice(1))?.scrollIntoView({ behavior: "smooth" })
+                  }}
+                >
+                  {item.label}
+                </a>
+              ))}
+              <a
+                href="https://revlabs.tech/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-700 hover:text-amber-600 font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Our Company
+              </a>
+              <Link
+                href="/comic-book-reader"
+                className="text-gray-700 hover:text-amber-600 font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Is It For Me?
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Contact Modal */}
       <ContactModal isOpen={contactModalOpen} onClose={() => setContactModalOpen(false)} />
