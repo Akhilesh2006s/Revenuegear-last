@@ -3,7 +3,7 @@
 import type React from "react"
 import { useEffect, useId, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { CheckCircle, Wrench, Briefcase, BarChart3, Frown, AlertTriangle, Search, Globe, X } from "lucide-react"
+import { CheckCircle, Wrench, Briefcase, BarChart3, Frown, AlertTriangle, Search, Globe } from "lucide-react"
 import { Poppins } from "next/font/google"
 
 const poppins = Poppins({
@@ -12,7 +12,6 @@ const poppins = Poppins({
   display: "swap",
 })
 
-// Hook for detecting clicks outside component
 function useOutsideClick(ref: React.RefObject<HTMLDivElement>, callback: () => void) {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -26,14 +25,6 @@ function useOutsideClick(ref: React.RefObject<HTMLDivElement>, callback: () => v
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [ref, callback])
-}
-
-const CloseIcon = () => {
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.05 } }}>
-      <X className="h-4 w-4 text-black" />
-    </motion.div>
-  )
 }
 
 interface Capability {
@@ -92,7 +83,7 @@ const capabilities: Capability[] = [
   },
   {
     icon: Search,
-    title: "100% Visibility & Analysis ",
+    title: "100% Visibility & Analysis",
     description: "Every single call is analyzed—outbound, inbound, Maintenance Reminders, PSFU—nothing is missed.",
     ctaText: "View More",
     ctaLink: "#",
@@ -131,10 +122,10 @@ export default function ExpandableFeatures() {
   useOutsideClick(ref, () => setActive(null))
 
   return (
-    <section id="capabilities" className="py-20 bg-transparent">
-      <div className="container mx-auto px-6 lg:px-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-center mb-16">
-          <h2 className={`text-4xl lg:text-5xl font-bold text-gray-900 mb-6 ${poppins.className}`}>
+    <section id="capabilities" className="py-12 md:py-20 bg-transparent">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-center mb-10 md:mb-16">
+          <h2 className={`text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6 ${poppins.className}`}>
             Our{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">
               Capabilities
@@ -142,71 +133,70 @@ export default function ExpandableFeatures() {
           </h2>
         </motion.div>
 
-        {/* Overlay */}
+        {/* Overlay with Blur */}
         <AnimatePresence>
           {active && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/20 h-full w-full z-50"
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm h-full w-full z-50"
             />
           )}
         </AnimatePresence>
 
-        {/* Expanded Card Modal */}
+        {/* Expanded Modal - Mobile Optimized */}
         <AnimatePresence>
-          {active ? (
-            <div className="fixed inset-0 grid place-items-center z-[100]">
-              <motion.button
-                key={`button-${active.title}-${id}`}
-                layout
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.05 } }}
-                className="flex absolute top-1 right-4 items-center justify-center bg-white rounded-full h-8 w-8 z-[110] shadow-lg hover:bg-gray-50 transition-colors"
-                onClick={() => setActive(null)}
-              >
-                <CloseIcon />
-              </motion.button>
+          {active && (
+            <div className="fixed inset-0 flex items-center justify-center z-[100] p-4">
               <motion.div
                 layoutId={`card-${active.title}-${id}`}
                 ref={ref}
-                className="w-full max-w-[600px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-white sm:rounded-3xl overflow-hidden shadow-2xl mx-4"
+                className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-xl md:rounded-2xl shadow-xl p-4 md:p-6 flex flex-col gap-4"
               >
-                <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-6">
-                  <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 md:gap-4">
                     <motion.div
                       layoutId={`icon-${active.title}-${id}`}
-                      className="w-12 h-12 bg-white rounded-full flex items-center justify-center"
+                      className="w-10 h-10 md:w-12 md:h-12 bg-orange-500 rounded-full flex items-center justify-center"
                     >
-                      <active.icon size={24} className="text-orange-500" />
+                      <active.icon size={20} className="text-white" />
                     </motion.div>
-                    <div className="flex-1">
-                      <motion.h3 layoutId={`title-${active.title}-${id}`} className="font-bold text-white text-xl">
-                        {active.title}
-                      </motion.h3>
-                    </div>
+                    <motion.h3 layoutId={`title-${active.title}-${id}`} className="font-bold text-lg md:text-xl text-gray-800">
+                      {active.title}
+                    </motion.h3>
                   </div>
+                  <motion.button
+                    layout
+                    onClick={() => setActive(null)}
+                    className="h-8 w-8 md:h-9 md:w-9 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 shadow-md"
+                  >
+                    <span className="text-xl font-bold text-gray-800">×</span>
+                  </motion.button>
                 </div>
 
-                <div className="flex-1 p-6">
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-gray-600 text-base leading-relaxed"
-                  >
-                    {active.description}
-                  </motion.div>
-                </div>
+                <motion.div
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-gray-600 text-sm md:text-base leading-relaxed"
+                >
+                  {active.description}
+                </motion.div>
+
+                <motion.button
+                  layout
+                  className="mt-4 px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 transition-opacity"
+                >
+                  Learn More
+                </motion.button>
               </motion.div>
             </div>
-          ) : null}
+          )}
         </AnimatePresence>
 
-        {/* Capability Cards List */}
+        {/* Cards Grid - Mobile Optimized */}
         <div className="max-w-2xl mx-auto">
           {capabilities.map((capability, index) => (
             <motion.div
@@ -215,21 +205,21 @@ export default function ExpandableFeatures() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.05 }}
               onClick={() => setActive(capability)}
-              className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 rounded-2xl cursor-pointer transition-all duration-300 border border-transparent hover:border-orange-200 mb-4 group"
+              className="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 rounded-xl md:rounded-2xl cursor-pointer transition-all duration-300 border border-transparent hover:border-orange-200 mb-3 md:mb-4 group"
             >
-              <div className="flex gap-4 flex-col md:flex-row flex-1">
+              <div className="flex gap-3 md:gap-4 flex-col md:flex-row flex-1">
                 <motion.div
                   layoutId={`icon-${capability.title}-${id}`}
-                  className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 flex-shrink-0"
+                  className="w-10 h-10 md:w-12 md:h-12 bg-orange-500 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 flex-shrink-0"
                 >
-                  <capability.icon size={24} className="text-white" />
+                  <capability.icon size={20} className="text-white" />
                 </motion.div>
                 <div className="flex-1">
                   <motion.h3
                     layoutId={`title-${capability.title}-${id}`}
-                    className={`font-bold text-gray-900 text-lg mb-10 items-center justify-center group-hover:text-orange-700 transition-colors ${poppins.className}`}
+                    className={`font-bold text-gray-900 text-base md:text-lg group-hover:text-orange-700 transition-colors ${poppins.className}`}
                   >
                     {capability.title}
                   </motion.h3>
@@ -237,8 +227,7 @@ export default function ExpandableFeatures() {
               </div>
               <motion.button
                 layoutId={`button-${capability.title}-${id}`}
-                className="px-6 py-1 text-sm rounded-full font-bold bg-gray-100 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 hover:text-white text-gray-700 mt-2 md:mt-0 transition-all duration-200 flex-shrink-0"
-                onClick={() => setActive(capability)}
+                className="px-4 py-1 text-xs md:text-sm rounded-full font-bold bg-gray-100 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 hover:text-white text-gray-700 mt-2 md:mt-0 transition-all duration-200 flex-shrink-0"
               >
                 {capability.ctaText}
               </motion.button>
