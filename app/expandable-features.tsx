@@ -185,12 +185,7 @@ export default function ExpandableFeatures() {
                   {active.description}
                 </motion.div>
 
-                <motion.button
-                  layout
-                  className="mt-4 px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 transition-opacity"
-                >
-                  Learn More
-                </motion.button>
+               
               </motion.div>
             </div>
           )}
